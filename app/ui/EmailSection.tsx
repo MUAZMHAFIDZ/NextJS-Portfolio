@@ -1,10 +1,46 @@
-import React from 'react'
+"use client"
+import React, { useState } from 'react'
 import GithubIcon from '../../public/github.svg'
 import LinkedinIcon from '../../public/linkedin.svg'
 import Link from 'next/link'
 import Image from 'next/image'
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const EmailSection = () => {
+    const [email, setEmail] = useState('');
+    const [subject, setSubject] = useState('');
+    const [message, setMessage] = useState('');
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch('/api/sendMail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, subject, message }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                toast.success('Email sent successfully!');
+                setEmail('')
+                setSubject('')
+                setMessage('')
+                console.log(result);
+            } else {
+                toast.error(`Error: ${result.message}`);
+            }
+        } catch (error) {
+            toast.error('An unexpected error occurred.');
+            console.error(error);
+        }
+    };
+
   return (
     <section id='contact' className='grid md:grid-cols-2 my-12 py-24 gap-4'>
         <div>
@@ -22,22 +58,28 @@ const EmailSection = () => {
             </div>
         </div>
         <div>
-            <form className="flex flex-col gap-2">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
                 <label htmlFor="email" className='text-white text-sm font-medium block'>Your Email</label>
                 <input 
                     type="email" id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required placeholder='youremail@example.com' 
                     className='bg-[#212125] border border-[#33333F] placeholder-[#ababce] text-gray-100 text-sm rounded-lg block w-full p-2.5 ' 
                 />
                 <label htmlFor="subject" className='mt-2 text-white text-sm font-medium block'>Subject</label>
                 <input 
                     type="text" id="subject" 
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
                     required placeholder='I want say Hi' 
                     className='bg-[#212125] border border-[#33333F] placeholder-[#ababce] text-gray-100 text-sm rounded-lg block w-full p-2.5 ' 
                 />
-                <label htmlFor="subject" className='mt-2 text-white text-sm font-medium block'>Message</label>
+                <label htmlFor="message" className='mt-2 text-white text-sm font-medium block'>Message</label>
                 <textarea
                     name="message" id="message" 
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
                     required placeholder='Hi, Nice to meet you....' 
                     className='bg-[#212125] border border-[#33333F] placeholder-[#ababce] text-gray-100 text-sm rounded-lg block w-full p-2.5 ' 
                 />
@@ -48,6 +90,7 @@ const EmailSection = () => {
                     Send Message
                 </button>
             </form>
+            <ToastContainer />
         </div>
     </section>
   )

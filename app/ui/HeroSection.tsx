@@ -1,10 +1,34 @@
 "use client"
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { TypeAnimation } from 'react-type-animation';
 
 
 const HeroSection = () => {
+  const [cvv, setCvv] = useState(false)
+  const [currentImage, setCurrentImage] = useState('/images/Hero-Image.png');
+
+  const images = [
+    '/images/Hero-Image.png',
+    '/images/Hero-Image2.png', 
+    '/images/Hero-Image3.png',
+    '/images/Hero-Image4.png'   
+  ];
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentImage((prevImage) => {
+        const currentIndex = images.indexOf(prevImage);
+        const nextIndex = (currentIndex + 1) % images.length; 
+        if(currentImage == images[3]) {
+          return images[0];
+        } 
+        return images[nextIndex];
+      });
+    }, 5000); 
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <section>
       <div className="grid grid-cols-1 lg:grid-cols-12">
@@ -25,7 +49,7 @@ const HeroSection = () => {
               1000,
             ]}
             wrapper="span"
-            speed={30}
+            speed={35}
             repeat={Infinity}
           />
           </h2>
@@ -34,17 +58,24 @@ const HeroSection = () => {
           </p>
           <div>
             <button className='rounded-full w-full md:w-fit px-6 py-3 mx-2 my-3 bg-gradient-to-br from-blue-900 via-purple-900 to-blue-700 text-white hover:border'>Hire Me</button>
-            <button className='rounded-full w-full md:w-fit px-6 py-3 mx-2 my-3 bg-gradient-to-br from-blue-900 via-purple-900 to-blue-700 text-white hover:border'>Download CV</button>
+            <button onClick={() => setCvv(!cvv)} className='rounded-full w-full md:w-fit px-6 py-3 mx-2 my-3 bg-gradient-to-br from-blue-900 via-purple-900 to-blue-700 text-white hover:border'>Download CV</button>
           </div>
+          {cvv && (<div>
+            <span className='text-white'>Choose One : </span>
+            <button className='rounded-full w-full md:w-fit px-6 py-3 mx-2 my-3 bg-gradient-to-br from-blue-700 via-purple-700 to-blue-700 text-white hover:border'>Indonesian CV</button>
+            <button className='rounded-full w-full md:w-fit px-6 py-3 mx-2 my-3 bg-gradient-to-br from-blue-700 via-purple-700 to-blue-700 text-white hover:border'>English CV</button>
+          </div>)}
         </div>
         
-        <div className="col-span-5 place-self-center py-5">
-          <div className="overflow-hidden rounded-full bg-[#212121] w-[250px] h-[250px] md:w-[300px] md:h-[300px] relative">
+        <div className="animate-myHeroImage2 col-span-5 place-self-center p-5">
+          <div className="animate-myHeroImage rounded-full overflow-hidden bg-[#212121] w-[250px] h-[250px] md:w-[300px] md:h-[300px] relative">
             <Image 
-              src="/images/Hero-Image.png"
+              src={currentImage}
               alt='MuazMHafidz'
-              width={300}
-              height={300}
+              width={400}
+              height={400}
+              className="object-cover w-full h-full"
+              style={{ opacity: 1, transition: 'opacity 1s ease-in-out' }}
             />
           </div>
         </div>
